@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIN Lookup Tool</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #121212 !important;
+            color: #e0e0e0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+        .container {
+            flex: 1;
+        }
+        .card {
+            background: linear-gradient(145deg, #2d2d2d, #252525);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border: none;
+            color: #e0e0e0;
+            border-radius: 15px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+        }
+        .form-control {
+            background-color: #3d3d3d;
+            border: 2px solid #4d4d4d;
+            color: #e0e0e0;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            padding: 12px;
+        }
+        .form-control:focus {
+            background-color: #3d3d3d;
+            border-color: #6d6d6d;
+            color: #e0e0e0;
+            box-shadow: 0 0 0 0.25rem rgba(130, 138, 145, 0.25);
+            transform: translateY(-2px);
+        }
+        .form-control::placeholder {
+            color: #888;
+        }
+        .form-text {
+            color: #888;
+            font-size: 0.9rem;
+            margin-top: 8px;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        .info-card {
+            background: linear-gradient(145deg, #2d2d2d, #252525);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+        .info-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #4466ee, #ee44bb);
+            opacity: 0.7;
+        }
+        .info-card-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #4466ee;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        .info-card-value {
+            font-size: 1.1rem;
+            color: #ffffff;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .info-card-value img {
+            width: 24px;
+            height: auto;
+        }
+        .alert-danger {
+            background-color: #3d2323;
+            border-color: #4d2c2c;
+            color: #ff8080;
+            border-radius: 10px;
+            padding: 1rem;
+        }
+        .btn-primary {
+            background: linear-gradient(145deg, #4466ee, #3355dd);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(145deg, #3355dd, #2244cc);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(51, 85, 221, 0.4);
+        }
+        .loading {
+            display: none;
+        }
+        .loading .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+        .result-container {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        h1 {
+            font-weight: 700;
+            background: linear-gradient(45deg, #4466ee, #ee44bb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 2rem;
+        }
+        h3 {
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 1.5rem;
+        }
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card p-4">
+                    <h1 class="text-center mb-4">BIN Lookup Tool</h1>
+                    <form id="binForm" class="mb-4">
+                        <div class="mb-3">
+                            <label for="binNumber" class="form-label">Enter BIN Number (first 6-8 digits)</label>
+                            <input type="text" class="form-control" id="binNumber" required
+                                pattern="^[0-9]{6,8}$" placeholder="Enter BIN number">
+                            <div class="form-text">Enter the first 6-8 digits of a card number</div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Look up BIN</button>
+                    </form>
+                    <div class="loading text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    <div class="result-container mt-4">
+                        <h3 class="mb-3">Card Information</h3>
+                        <div id="resultData">
+                            <div id="resultBody" class="info-grid"></div>
+                        </div>
+                    </div>
+                    <div id="errorMessage" class="alert alert-danger mt-3" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('binForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const binNumber = document.getElementById('binNumber').value;
+            const loading = document.querySelector('.loading');
+            const resultContainer = document.querySelector('.result-container');
+            const errorMessage = document.getElementById('errorMessage');
+            const resultBody = document.getElementById('resultBody');
+
+            // Reset display
+            loading.style.display = 'block';
+            resultContainer.style.display = 'none';
+            errorMessage.style.display = 'none';
+
+            try {
+                const response = await fetch(`https://easilypay.co.uk/api/find.php?bin=${binNumber}`);
+                const data = await response.json();
+
+                if (data && Object.keys(data).length > 0) {
+                    resultBody.innerHTML = '';
+                    for (const [key, value] of Object.entries(data)) {
+                        if (value) {
+                            const card = document.createElement('div');
+                            card.className = 'info-card';
+                            if (key === 'country') {
+                                const countryCode = data.country_code || '';
+                                card.innerHTML = `
+                                    <div class="info-card-label">COUNTRY</div>
+                                    <div class="info-card-value">
+                                        ${countryCode ? `<img src="https://flagcdn.com/w20/${countryCode.toLowerCase()}.png" alt="${value} flag">` : ''}
+                                        ${value}
+                                    </div>
+                                `;
+                            } else {
+                                card.innerHTML = `
+                                    <div class="info-card-label">${key.replace(/_/g, ' ').toUpperCase()}</div>
+                                    <div class="info-card-value">${value}</div>
+                                `;
+                            }
+                            resultBody.appendChild(card);
+                        }
+                    }
+                    resultContainer.style.display = 'block';
+                } else {
+                    throw new Error('No data found for this BIN');
+                }
+            } catch (error) {
+                errorMessage.textContent = error.message || 'Failed to fetch BIN information';
+                errorMessage.style.display = 'block';
+            } finally {
+                loading.style.display = 'none';
+            }
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
